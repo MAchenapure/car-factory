@@ -20,10 +20,10 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore dependencies
-        run: dotnet restore ./src/CarFactory.Sales.sln
+        run: dotnet restore ./CarFactory.Sales.sln
 
       - name: Build solution
-        run: dotnet build ./src/CarFactory.Sales.sln --no-restore --configuration Release
+        run: dotnet build ./CarFactory.Sales.sln --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test ./src/CarFactory.Sales.sln --no-build --verbosity normal --configuration Release
+        run: dotnet test ./CarFactory.Sales.sln --no-build --verbosity normal --configuration Release
