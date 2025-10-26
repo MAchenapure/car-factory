@@ -1,6 +1,7 @@
 using CarFactory.Sales.Application.Features.Sales.RegisterSale;
 using CarFactory.Sales.Application.Interfaces;
 using CarFactory.Sales.Domain.Entities.Cars.Enums;
+using CarFactory.Sales.Domain.Entities.DistributionCenters;
 using CarFactory.Sales.Domain.Entities.Sales;
 using FluentAssertions;
 using Moq;
@@ -27,6 +28,7 @@ namespace CarFactory.Sales.Tests.Application
         {
             var command = new RegisterSaleCommand(0, CarModel.Sedan, 1);
             _mockRepo.Setup(r => r.AddSaleAsync(It.IsAny<Sale>())).Returns(Task.CompletedTask);
+            _mockRepo.Setup(r => r.GetCentersAsync()).ReturnsAsync(new[] { new DistributionCenter(0, "Norte") });
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
