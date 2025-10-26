@@ -48,8 +48,10 @@ namespace CarFactory.Sales.Tests.Application
             result.Should().ContainKey("Norte");
             result.Should().ContainKey("Sur");
 
-            result["Norte"].Should().Be(40000m);
-            result["Sur"].Should().Be(20000m);
+            result["Norte"].Quantity.Should().Be(2);
+            result["Norte"].Total.Should().Be(40000m);
+            result["Sur"].Quantity.Should().Be(1);
+            result["Sur"].Total.Should().Be(20000m);
 
             _mockRepo.Verify(r => r.GetAllAsync(), Times.Once);
             _mockRepo.Verify(r => r.GetCentersAsync(), Times.Once);
