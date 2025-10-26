@@ -11,12 +11,21 @@ namespace CarFactory.Sales.Application.Features.Sales.RegisterSale
 
         public RegisterSaleHandler(ISalesRepository repo) => _repo = repo;
 
+        /// <summary>
+        /// Maneja el comando para registrar una venta.
+        /// </summary>
+        /// <param name="request">Comando con los datos de la venta.</param>
+        /// <param name="cancellationToken">Token de cancelación.</param>
+        /// <returns>
+        /// Un objeto con los datos de la venta registrada.
+        /// </returns>
         public async Task<RegisterSaleResponse> Handle(RegisterSaleCommand request, CancellationToken cancellationToken)
         {
+            // Crea una instancia del auto según el modelo solicitado y calcula el precio total según las reglas de negocio definidas.
             var car = Domain.Entities.Cars.Factory.CarFactory.Create(request.Model);
-            var unitPrice = car.UnitPrice;
             var total = car.CalculateTotal(request.Units);
-
+            var unitPrice = car.UnitPrice;
+            
             var sale = new Sale(Guid.NewGuid(), request.CenterId, car.Model, request.Units, unitPrice, total, DateTime.UtcNow);
             await _repo.AddSaleAsync(sale);
 

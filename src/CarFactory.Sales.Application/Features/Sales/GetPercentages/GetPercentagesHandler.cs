@@ -1,5 +1,4 @@
 using MediatR;
-using System.Diagnostics;
 using CarFactory.Sales.Application.Interfaces;
 using CarFactory.Sales.Domain.Entities.Cars.Enums;
 
@@ -10,6 +9,15 @@ namespace CarFactory.Sales.Application.Features.Sales.GetPercentages
         private readonly ISalesRepository _repo;
         public GetPercentagesHandler(ISalesRepository repo) => _repo = repo;
 
+        /// <summary>
+        /// Maneja la consulta para obtener los porcentajes de ventas por centro y modelo.
+        /// </summary>
+        /// <param name="request">Consulta recibida (sin parámetros).</param>
+        /// <param name="cancellationToken">Token de cancelación.</param>
+        /// <returns>
+        /// Un diccionario donde la clave es el nombre del centro y el valor es otro diccionario
+        /// con el modelo de auto y su porcentaje de ventas respecto al total.
+        /// </returns>
         public async Task<Dictionary<string, Dictionary<CarModel, decimal>>> Handle(GetPercentagesQuery request, CancellationToken cancellationToken)
         {
             var sales = await _repo.GetAllAsync();
@@ -19,6 +27,7 @@ namespace CarFactory.Sales.Application.Features.Sales.GetPercentages
             if (totalUnits == 0)
                 return new Dictionary<string, Dictionary<CarModel, decimal>>();
 
+            // Agrupa las ventas por centro y luego por modelo, calculando el porcentaje de cada modelo
             var result = sales
                 .GroupBy(s => s.CenterId)
                 .ToDictionary(
