@@ -1,0 +1,63 @@
+﻿using CarFactory.Sales.Application.Features.Sales.GetPercentages;
+using CarFactory.Sales.Application.Interfaces;
+using CarFactory.Sales.Domain.Entities.Cars.Enums;
+using CarFactory.Sales.Domain.Entities.DistributionCenters;
+using CarFactory.Sales.Domain.Entities.Sales;
+using FluentAssertions;
+using Moq;
+using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
+
+namespace CarFactory.Sales.Tests.Application
+{
+    public class GetPercentagesHandlerTests
+    {
+        private readonly Mock<ISalesRepository> _mockRepo;
+        private readonly GetPercentagesHandler _handler;
+
+        public GetPercentagesHandlerTests()
+        {
+            _mockRepo = new Mock<ISalesRepository>();
+            _handler = new GetPercentagesHandler(_mockRepo.Object);
+        }
+
+        [Fact]
+        public async Task Handle_Should_Return_Percentages_By_Center_And_Model()
+        {
+            var centers = new List<DistributionCenter>
+            {
+                new DistributionCenter(1, "Norte"),
+                new DistributionCenter(2, "Sur")
+            };
+
+            var sales = new List<Sale>
+            {
+                new Sale(Guid.NewGuid(), 1, CarModel.Sedan, 2, 10000, 20000, DateTime.UtcNow),
+                new Sale(Guid.NewGuid(), 1, CarModel.SUV, 1, 20000, 20000, DateTime.UtcNow),
+                new Sale(Guid.NewGuid(), 2, CarModel.SUV, 2, 20000, 40000, DateTime.UtcNow)
+            };
+
+            _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(sales);
+            _mockRepo.Setup(r => r.GetCentersAsync()).ReturnsAsync(centers);
+
+            var result = await _handler.Handle(new GetPercentagesQuery(), CancellationToken.None);
+
+            result.Should().ContainKey("Norte");
+            result.Should().ContainKey("Sur");
+
+            result["Norte"].Should().ContainKey(CarModel.Sedan);
+            result["Norte"].Should().ContainKey(CarModel.SUV);
+            result["Sur"].Should().ContainKey(CarModel.SUV);
+
+            result["Norte"][CarModel.Sedan].Should().Be(40.00m);
+            result["Norte"][CarModel.SUV].Should().Be(20.00m);
+            result["Sur"][CarModel.SUV].Should().Be(40.00m);
+
+            _mockRepo.Verify(r => r.GetAllAsync(), Times.Once);
+            _mockRepo.Verify(r => r.GetCentersAsync(), Times.Once);
+        }
+    }
+}
