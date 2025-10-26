@@ -13,10 +13,10 @@ namespace CarFactory.Sales.Infrastructure.Repositories
         public InMemoryRepository()
         {
             _centers.AddRange(new[] {
-                new DistributionCenter(1, "Norte"),
-                new DistributionCenter(2, "Sur"),
-                new DistributionCenter(3, "Este"),
-                new DistributionCenter(4, "Oeste"),
+                new DistributionCenter(0, "Norte"),
+                new DistributionCenter(1, "Sur"),
+                new DistributionCenter(2, "Este"),
+                new DistributionCenter(3, "Oeste"),
             });
 
             var rand = new Random(42);
@@ -24,7 +24,7 @@ namespace CarFactory.Sales.Infrastructure.Repositories
             for (int i = 0; i < 30; i++)
             {
                 var model = models[rand.Next(models.Length)];
-                var center = rand.Next(1, 5);
+                var center = rand.Next(0, 4);
                 var units = rand.Next(1, 5);
                 var car = Domain.Entities.Cars.Factory.CarFactory.Create(model);
                 var total = car.CalculateTotal(units);
